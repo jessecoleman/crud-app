@@ -10,13 +10,27 @@
 		<!-- jQuery, Bootstrap -->
 		<script src="https://code.jquery.com/jquery.min.js"></script>
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js">
-		</script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script src="//www.parsecdn.com/js/parse-1.6.0.min.js"></script>
+		<script type="text/javascript" src="js/jquery.raty-fa.js"></script>
 
 		<!-- Custom files -->
 		<script type="text/javascript" src="js/main.js"></script>
 		<link rel="stylesheet" href="css/main.css"/>
 	</head>
 	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12 form-group">
+					<form role="form" id="review">
+						<label>Title <input type="text" id="title" placeholder="title of review"></label></br>
+						<label>Review <input type="text-box" id="content" placeholder="what did you think of this"></label>
+						<button type="submit" class="btn btn-primary">Submit Review</button>
+					</form>
+					<div id="raty-container">
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
