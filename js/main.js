@@ -1,28 +1,57 @@
 (function() {
-	window.onload = function() {
+	//Parse object
+    var Review;
+
+    window.onload = function() {
 		//initialize parse app
-		Parse.initialize('67M2CjbYLXlKPZwcKbHWkK1m6Gk1rRpVXucDjOIy', 
-						 'pdoBbMrpYabDx8vl8JYzeeBe2VsMl6WFc9Covw5F');
+		Parse.initialize('67M2CjbYLXlKPZwcKbHWkK1m6Gk1rRpVXucDjOIy', 'pdoBbMrpYabDx8vl8JYzeeBe2VsMl6WFc9Covw5F');
 		//create subclass of Parse.Object
-		var Review = Parse.Object.extend('Music');
+		Review = Parse.Object.extend('Music');
 
-		buildRaty():
+		//insert raty element in page
+		buildRaty();
 
-		$('#review').submit(submitReview);
+        //fetches reviews from Parse.com
+        getData();
+
+        //handles submitting of review and sending to Parse.com
+		$('#review').submit(function() {
+            var review = new Review();
+            //submit review
+            $(this).find('label').each(function() {
+                review.set($(this).next().attr('id'), $(this).next().val());
+            });
+            //submit rating
+            review.set('rating', $('#raty-container').raty('score'));
+
+            // after setting properties, save new instance back to database
+            review.save(null, {
+                success: getData
+            });
+
+            return false;
+        });
 	};
 
 	var buildRaty = function() {
-		$('#raty-container').raty({score:5});
+		$('#raty-container').raty();
 	};
 
-	//handles data sent to Parse.com
-	var submitReview = function() {
-		$(this).find('input').each(function() {
-			Review.set($(this).attr('id'), $(this).val());
-		});
+    var getData = function() {
+        var query = new Parse.Query(Review);
 
-		// after setting properties, save new instance back to database	
-		Review.save();
-	};
+        query.exists('title');
+
+        query.find({
+            success: function (results) {
+                var title = results.title;
+                var content = results.content;
+                var rating = results.rating;
+
+
+                $('#reviews').append();
+            }
+        });
+    };
 	
 })();
