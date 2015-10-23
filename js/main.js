@@ -10,6 +10,7 @@
 
 		//insert raty element in page
 		buildRaty();
+        buildSlideshow();
 
         //fetches reviews from Parse.com
         getData();
@@ -20,9 +21,12 @@
             //submit review
             $(this).find('label').each(function() {
                 review.set($(this).next().attr('id'), $(this).next().val());
+                $(this).next().val('');
             });
             //submit rating
-            review.set('rating', $('#raty-container').raty('score'));
+            var ratyContainer = $('#raty-container');
+            review.set('rating', ratyContainer.raty('score'));
+            ratyContainer.raty('reload');
 
             // after setting properties, save new instance back to database
             review.save(null, {
@@ -37,20 +41,42 @@
 		$('#raty-container').raty();
 	};
 
+    var buildSlideshow = function() {
+        $('.slider').ready(function() {
+            $('.slider').slider({full_width: true, indicators: false});
+        });
+
+        var dir = 'img/';
+        var fileExtension = '.jpg';
+    };
+
     var getData = function() {
         var query = new Parse.Query(Review);
 
         query.exists('title');
+        query.exists('content');
+        query.exists('rating');
 
         query.find({
-            success: function (results) {
-                var title = results.title;
-                var content = results.content;
-                var rating = results.rating;
-
-
-                $('#reviews').append();
+            success: function(results) {
+                $('#reviews').empty();
+                buildReviews(results);
             }
+        });
+    };
+
+    var buildReviews = function(results) {
+        results.forEach(function(result) {
+            console.log(result.get('title') + result.get('content') + result.get('rating'));
+            var title = $('<span/>').text(result.get('title'));
+            var content = $('<p/>').text(result.get('content'));
+            var rating = $('<div/>').raty({score: result.get('rating'), readOnly: true});
+            //build rating html with materialize
+            var card_content = $('<div/>').addClass("card-content").append(rating).append(title).append(content);
+            var card = $('<div/>').addClass("card").append(card_content);
+            var col = $('<div/>').addClass("col s12 l6").append(card);
+            $('#reviews').append(col);
+
         });
     };
 	
