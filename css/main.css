@@ -10,4 +10,5 @@ html {
 
 .vote-count {
     font-size: 12px;
+    float: right;
 }
