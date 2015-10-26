@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Crud App</title>
+
+        <!-- jQuery, Parse, font-awesome -->
+        <script src="https://code.jquery.com/jquery.min.js"></script>
+        <script src="//www.parsecdn.com/js/parse-1.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+        <!-- Custom files -->
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script type="text/javascript" src="js/login.js"></script>
+        <link rel="stylesheet" href="css/materialize.min.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/login.css" />
+    </head>
+    <body>
+        <nav>
+            <div class="nav-wrapper green lighten-1">
+                <a href="index.html" class="brand-logo center">Microsoft Surface Book</a>
+            </div>
+        </nav>
+        <div class="container section">
+            <div class="row">
+                <div class="col s12 m8 l6 offset-m2 offset-l3">
+                    <div class="card">
+                        <div class="card-content">
+                            <form role="form" id="login">
+                                <div class="input-field">
+                                    <label for="username">Username</label>
+                                    <input type="text" id="username" />
+                                </div>
+                                <div class="input-field">
+                                    <label for="password">Password</label>
+                                    <input type="password" id="password" />
+                                </div>
+                                <button type="button" id="login-button" class="btn blue darken-3 waves-effect waves-light">Login</button>
+                            </form>
+                            <form role="form" id="signup">
+                                <div class="input-field">
+                                    <label for="username">Username</label>
+                                    <input type="text" id="new-username" />
+                                </div>
+                                <div class="input-field">
+                                    <label for="password">Password</label>
+                                    <input id="new-password" type="password" />
+                                </div>
+                                <div class="input-field">
+                                    <label for="password">Retype Password</label>
+                                    <input type="password" id="new-password-confirm" />
+                                </div>
+                                <button type="button" id="signup-button" class="btn green waves-effect waves-light">Sign Up</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="signup-text">
+                        <span>Don't have an account yet?</span>
+                        <button type="button" id="sign-up" class="btn green waves-effect waves-light">Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

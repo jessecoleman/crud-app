@@ -12,3 +12,12 @@ html {
     font-size: 12px;
     float: right;
 }
+
+.reviewer {
+    display: block;
+}
+
+#rating-table {
+    width: 400px;
+    height: 100px;
+}

@@ -1,5 +1,4 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -15,7 +14,6 @@
 		<!-- Custom files -->
 		<script type="text/javascript" src="js/jquery.raty-fa.js"></script>
 		<script type="text/javascript" src="js/materialize.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<link rel="stylesheet" href="css/materialize.min.css" />
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -74,7 +72,11 @@
 								</li>
 							</ul>
 						</div>
-						<div class="card-content">
+						<div id="login-to-review" class="card-content">
+							<button id="login-button" class="btn blue darken-3 waves-effect waves-light right">Login</button>
+							<p>Please login to leave a review</p><br>
+						</div>
+						<div id="review-container" class="card-content">
 							<span id="raty-container"></span>
 							<form role="form" id="review">
 								<div class="input-field">
@@ -90,6 +92,16 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div id="rating" class="row">
+				<svg id="rating-table">
+					<path fill="#000000" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path>
+					<rect height="20" x="0" y="0" fill="#FF8A65"></rect>
+					<rect height="20" x="0" y="20" fill="#FFB74D"></rect>
+					<rect height="20" x="0" y="40" fill="#FFF176"></rect>
+					<rect height="20" x="0" y="60" fill="#9CCC65"></rect>
+					<rect height="20" x="0" y="80" fill="#66BB6A"></rect>
+				</svg>
 			</div>
 			<div id="reviews" class="row">
 			</div>

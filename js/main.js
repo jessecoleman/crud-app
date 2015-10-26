@@ -1,12 +1,28 @@
 (function() {
 	//Parse object
     var Review;
+    //User object
+    var currentUser;
 
-    window.onload = function() {
+    $(document).ready(function() {
 		//initialize parse app
 		Parse.initialize('67M2CjbYLXlKPZwcKbHWkK1m6Gk1rRpVXucDjOIy', 'pdoBbMrpYabDx8vl8JYzeeBe2VsMl6WFc9Covw5F');
+
+		currentUser = Parse.User.current();
+        if(currentUser) {
+            $('nav a').text('logout').prop('href', 'login.html?logout');
+            $('#nav-mobile').prepend($('<li/>').text(currentUser.get('username')));
+            $('#login-to-review').hide();
+        } else {
+            $('#review-container').hide();
+        }
 		//create subclass of Parse.Object
 		Review = Parse.Object.extend('Review');
+
+        //login button redirects to login.html
+        $('#login-button').click(function() {
+            window.location.replace('login.html');
+        });
 
 		//insert raty element in page
 		buildRaty();
@@ -17,24 +33,24 @@
 
         //handles submitting of review and sending to Parse.com
 		$('#submit-review').click(function() {
-            console.log('success');
             //review object
             var review = new Review();
             //user generated data
             var title = $('#title').val();
             var content = $('#content').val();
             var rating = $('#raty-container').raty('score');
-            //save user data in review object
-            review.set('title', title);
-            review.set('content', content);
-            review.set('rating', rating);
-            //initialize votes at zero
-            review.set('total-votes', '0');
-            review.set('up-votes', '0');
+            var reviewer = currentUser;
 
             // after setting properties, save new instance back to database and clear inputs
-            if(title && content && rating) {
-                review.save(null, {
+            if(title && content && rating && currentUser) {
+                review.save({
+                    'title': title,
+                    'content': content,
+                    'rating': rating,
+                    'reviewer': reviewer,
+                    'totalVotes': 0,
+                    'upVotes': 0
+                }, {
                     success: function() {
                         getData();
                         //clear forms
@@ -48,7 +64,7 @@
             }
             return false;
         });
-	};
+	});
 
 	var buildRaty = function() {
 		$('#raty-container').raty();
@@ -68,6 +84,7 @@
         query.exists('title');
         query.exists('content');
         query.exists('rating');
+        query.include('reviewer');
 
         query.find({
             success: function(results) {
@@ -80,50 +97,107 @@
 
     //adds each review object to the dom with materialize html/css
     var buildReviews = function(results) {
+        var ratings = [0, 0, 0, 0, 0];
+        var numRatings = 0;
         results.forEach(function(result) {
             var title = $('<div/>').text(result.get('title')).addClass('card-title black-text');
             var content = $('<p/>').text(result.get('content')).prepend($('<br>'));
             var rating = $('<span/>').raty({score: result.get('rating'), readOnly: true});
-            var voteUpButton = $('<button/>').addClass('vote-up btn-flat white waves-effect waves-green')
-                                             .append($('<i/>').text('thumb_up').addClass('material-icons'))
-                                             .click(function() {voteReview($(this), result)});
-            var voteDownButton = $('<button/>').addClass('vote-down btn-flat white waves-effect waves-red')
-                                               .append($('<i/>').text('thumb_down').addClass('material-icons'))
-                                               .click(function() {voteReview($(this), result)});
-            var deleteButton = $('<button/>').addClass('delete waves-effect waves-red btn-flat white')
-                                             .append($('<i/>')).text('delete').addClass('material-icons')
-                                             .click(function() {deleteReview(result)});
-            var voteCount = $('<span/>').addClass('vote-count').text('Nobody has voted on this review');
-            title.prepend(voteDownButton).prepend(voteUpButton).prepend(deleteButton);
+            var reviewer = $('<span/>').text("Author: " + result.get('reviewer').get('username')).addClass('reviewer');
+            //if review was created by current user
+            if(currentUser && currentUser.id === result.get('reviewer').id) {
+                var deleteButton = $('<button/>').addClass('delete waves-effect waves-red btn-flat white')
+                    .append($('<i/>')).text('delete').addClass('material-icons')
+                    .click(function() {deleteReview(result)});
+                title.prepend(deleteButton);
+            } else {
+                var voteUpButton = $('<button/>').addClass('vote-up btn-flat white waves-effect waves-green')
+                    .append($('<i/>').text('thumb_up').addClass('material-icons'))
+                    .click(function() {voteReview($(this), result)});
+                var voteDownButton = $('<button/>').addClass('vote-down btn-flat white waves-effect waves-red')
+                    .append($('<i/>').text('thumb_down').addClass('material-icons'))
+                    .click(function() {voteReview($(this), result)});
+                title.prepend(voteDownButton).prepend(voteUpButton);
+            }
+            var voteCount = $('<span/>').addClass('vote-count');
+                if(result.get('totalVotes')) {
+                    voteCount.text(result.get('upVotes') + " out of " +
+                                   result.get('totalVotes') + " people found this review helpful");
+                } else {
+                    voteCount.text('Nobody has voted on this review');
+                }
             //build rating html with materialize
-            var cardContent = $('<div/>').addClass('card-content').append(title).append(rating).append(voteCount).append(content);
+            var cardContent = $('<div/>').addClass('card-content').append(title).append(rating).append(voteCount).append(reviewer).append(content);
             var card = $('<div/>').addClass('card').append(cardContent);
             var col = $('<div/>').addClass('col s12 l6').append(card);
             $('#reviews').append(col);
 
+            //get average rating
+            ratings[result.get('rating') - 1]++;
+            numRatings++;
+        });
+
+        buildTable(ratings, numRatings);
+    }
+
+    var buildTable = function(ratings, numRatings) {
+        $('rect').each(function(index) {
+            $(this).attr('width', Math.floor(ratings[index] / numRatings * 400));
         });
     };
 
     //controls voting of reviews by updating buttons and count
     var voteReview = function(button, result) {
-        //increment total votes
-        result.increment('total-votes');
-        alert(result.get('total-votes'));
-        //if upvoting review
+        //if clicking upvote
         if(button.hasClass('vote-up')) {
-            result.increment('up-votes');
-            button.prop('disabled', true).removeClass('waves-effect waves-green');
-            button.siblings('.vote-down').prop('disabled', false).addClass('waves-effect waves-red');
+            //if upvote isn't already selected
+            if(button.hasClass('white')) {
+                //if user had previously downvoted
+                if(button.siblings('.vote-down').hasClass('red')){
+                    result.increment('upVotes');
+                    button.addClass('green').removeClass('white');
+                    button.siblings('.vote-down').removeClass('red').addClass('white');
+                }
+                //if user hadn't voted at all yet
+                else {
+                    result.increment('totalVotes');
+                    result.increment('upVotes');
+                    button.addClass('green').removeClass('white');
+                }
+            }
+            //if upvote is selected
+            else {
+                result.increment('upVotes', -1);
+                result.increment('totalVotes', -1);
+                button.removeClass('green').addClass('white');
+            }
         }
-        //if downvoting a review
+        //if clicking downvote
         else {
-            button.prop('disabled', true).removeClass('waves-effect waves-red');
-            button.siblings('.vote-up').prop('disabled', false).addClass('waves-effect waves-green');
+            //if downvote isn't already selected
+            if(button.hasClass('white')) {
+                //if user had previously upvoted
+                if(button.siblings('.vote-up').hasClass('green')){
+                    result.increment('upVotes', -1);
+                    button.addClass('red').removeClass('white');
+                    button.siblings('.vote-up').removeClass('green').addClass('white');
+                }
+                //if user hadn't voted at all yet
+                else {
+                    result.increment('totalVotes');
+                    button.addClass('red').removeClass('white');
+                }
+            }
+            //if downvote is selected
+            else {
+                result.increment('totalVotes', -1);
+                button.removeClass('red').addClass('white');
+            }
         }
         result.save(null, {
             success: function() {
-                button.siblings('.vote-count').text(result.get('up-votes') + " out of " +
-                                                    result.get('total-votes') + " people found this review helpful");
+                button.parent().siblings('.vote-count').text(result.get('upVotes') + " out of " +
+                                                    result.get('totalVotes') + " people found this review helpful");
             }
         });
     };
