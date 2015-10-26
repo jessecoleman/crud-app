@@ -118,6 +118,13 @@
                     .append($('<i/>').text('thumb_down').addClass('material-icons'))
                     .click(function() {voteReview($(this), result)});
                 title.prepend(voteDownButton).prepend(voteUpButton);
+                //if user has voted during previous session, restore old votes
+                console.log(currentUser);
+                if(currentUser.get('votes')[result.get('id')] === 'voteUp') {
+                    voteReview(voteUpButton, result);
+                } else if(currentUser.get('votes')[result.get('id')] === 'voteDown') {
+                    voteReview(voteDownButton, result);
+                }
             }
             var voteCount = $('<span/>').addClass('vote-count');
                 if(result.get('totalVotes')) {
@@ -155,6 +162,7 @@
                 //if user had previously downvoted
                 if(button.siblings('.vote-down').hasClass('red')){
                     result.increment('upVotes');
+                    //switch button colors that indicate selected button
                     button.addClass('green').removeClass('white');
                     button.siblings('.vote-down').removeClass('red').addClass('white');
                 }
@@ -164,11 +172,20 @@
                     result.increment('upVotes');
                     button.addClass('green').removeClass('white');
                 }
+                //updates users votes to be loaded later on
+                var voteArray = currentUser.get('votes');
+                voteArray[result.get('id')] = 'voteUp';
+                currentUser.set('votes', voteArray);
             }
             //if upvote is selected
             else {
                 result.increment('upVotes', -1);
                 result.increment('totalVotes', -1);
+                //updates users votes to be loaded later on
+                var voteArray = currentUser.get('votes');
+                voteArray[result.get('id')] = '';
+                currentUser.set('votes', voteArray);
+                //switch button colors that indicate selected button    
                 button.removeClass('green').addClass('white');
             }
         }
@@ -187,11 +204,19 @@
                     result.increment('totalVotes');
                     button.addClass('red').removeClass('white');
                 }
+                //updates users votes to be loaded later on
+                var voteArray = currentUser.get('votes');
+                voteArray[result.get('id')] = 'voteDown';
+                currentUser.set('votes', voteArray);
             }
             //if downvote is selected
             else {
                 result.increment('totalVotes', -1);
                 button.removeClass('red').addClass('white');
+                //updates users votes to be loaded later on
+                var voteArray = currentUser.get('votes');
+                voteArray[result.get('id')] = '';
+                currentUser.set('votes', voteArray);
             }
         }
         result.save(null, {
