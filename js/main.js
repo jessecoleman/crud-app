@@ -152,7 +152,7 @@
         $('rect').each(function(index) {
             $(this).attr('width', Math.floor(ratings[index] / numRatings * 100) + '%');
             $(this).attr('x', 0);
-            $(this).attr('y', 20 * index);
+            $(this).attr('y', 21 * index);
             $(this).attr('height', '20%');
         });
     };

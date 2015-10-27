@@ -19,7 +19,7 @@ html {
 
 #rating-table {
     width: 420px;
-    height: 100px;
+    height: 105px;
 }
 
 .m-red {
@@ -42,13 +42,12 @@ html {
     float: right;
 }
 
-#rating-legend td {
-    height: 20px;
+#rating-legend tr, #rating-legend td {
     padding: 0;
 }
 
 #rating-legend i {
-    font-size: 18px;
+    font-size: 16px;
     vertical-align: text-top;
 }
 
