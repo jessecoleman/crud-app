@@ -1,9 +1,20 @@
+/*  Cole Chamberlin
+    10/27/15
+    INFO 343
+    Crud-App
+
+    This file contains all the logic for index.html, handling all user interactivity and data loading and saving
+*/
+
 (function() {
+    "use strict";
+
 	//Parse object
     var Review;
     //User object
     var currentUser;
 
+    //initializes page, loading things like current user, controls for reviewing and voting, and some ui stuff
     $(document).ready(function() {
 		//initialize parse app
 		Parse.initialize('67M2CjbYLXlKPZwcKbHWkK1m6Gk1rRpVXucDjOIy', 'pdoBbMrpYabDx8vl8JYzeeBe2VsMl6WFc9Covw5F');
@@ -26,8 +37,8 @@
 
 		//insert raty element in page
 		buildRaty();
+        //insert slideshow in page
         buildSlideshow();
-
         //fetches reviews from Parse.com
         getData();
 
@@ -39,7 +50,6 @@
             var title = $('#title').val();
             var content = $('#content').val();
             var rating = $('#raty-container').raty('score');
-            var reviewer = currentUser;
 
             // after setting properties, save new instance back to database and clear inputs
             if(title && content && rating && currentUser) {
@@ -47,7 +57,7 @@
                     'title': title,
                     'content': content,
                     'rating': rating,
-                    'reviewer': reviewer,
+                    'reviewer': currentUser,
                     'totalVotes': 0,
                     'upVotes': 0
                 }, {
@@ -66,10 +76,12 @@
         });
 	});
 
-	var buildRaty = function() {
+	//initializes raty widget
+    var buildRaty = function() {
 		$('#raty-container').raty();
 	};
 
+    //initializes materialize slideshow
     var buildSlideshow = function() {
         $('.slider').ready(function() {
             $('.slider').slider({full_width: true, indicators: false});
@@ -78,6 +90,7 @@
 
     };
 
+    //performs query on Parse database, passes results to function for processing
     var getData = function() {
         var query = new Parse.Query(Review);
 
@@ -118,14 +131,6 @@
                     .append($('<i/>').text('thumb_down').addClass('material-icons'))
                     .click(function() {voteReview($(this), result)});
                 title.prepend(voteDownButton).prepend(voteUpButton);
-                //if user has voted during previous session, restore old votes
-                /*
-                console.log(currentUser);
-                if(currentUser && currentUser.get('votes')[result.get('id')] === 'voteUp') {
-                    voteReview(voteUpButton, result);
-                } else if(currentUser && currentUser.get('votes')[result.get('id')] === 'voteDown') {
-                    voteReview(voteDownButton, result);
-                }*/
             }
             var voteCount = $('<span/>').addClass('vote-count');
                 if(result.get('totalVotes')) {
@@ -146,15 +151,22 @@
         });
 
         buildTable(ratings, numRatings);
-    }
+    };
 
+    //does the math to determine correct widths and heights of bars
     var buildTable = function(ratings, numRatings) {
-        $('rect').each(function(index) {
-            $(this).attr('width', Math.floor(ratings[index] / numRatings * 100) + '%');
+        //longest bar set to full length of view, other bars scaled appropriately
+        var max = Math.max.apply(null, ratings) / numRatings * 100;
+        var rateTotal = 0;
+	    $('rect').each(function(index) {
+            $(this).attr('width', Math.floor(ratings[index] / numRatings * 10000 / max) + '%');
             $(this).attr('x', 0);
             $(this).attr('y', 21 * index);
             $(this).attr('height', '20%');
+		    rateTotal += ratings[index] * (index + 1);
         });
+	    var rateAverage = rateTotal / numRatings;
+	    $('#average-rating').html(Math.round(rateAverage * 10) / 10 + '<i class="material-icons">star</i>');
     };
 
     //controls voting of reviews by updating buttons and count
@@ -176,19 +188,11 @@
                     result.increment('upVotes');
                     button.addClass('green').removeClass('white');
                 }
-                //updates users votes to be loaded later on
-                var voteArray = currentUser.get('votes');
-                voteArray[result.get('id')] = 'voteUp';
-                currentUser.set('votes', voteArray);
             }
             //if upvote is selected
             else {
                 result.increment('upVotes', -1);
                 result.increment('totalVotes', -1);
-                //updates users votes to be loaded later on
-                var voteArray = currentUser.get('votes');
-                voteArray[result.get('id')] = '';
-                currentUser.set('votes', voteArray);
                 //switch button colors that indicate selected button    
                 button.removeClass('green').addClass('white');
             }
@@ -208,19 +212,11 @@
                     result.increment('totalVotes');
                     button.addClass('red').removeClass('white');
                 }
-                //updates users votes to be loaded later on
-                var voteArray = currentUser.get('votes');
-                voteArray[result.get('id')] = 'voteDown';
-                currentUser.set('votes', voteArray);
             }
             //if downvote is selected
             else {
                 result.increment('totalVotes', -1);
                 button.removeClass('red').addClass('white');
-                //updates users votes to be loaded later on
-                var voteArray = currentUser.get('votes');
-                voteArray[result.get('id')] = '';
-                currentUser.set('votes', voteArray);
             }
         }
         result.save(null, {

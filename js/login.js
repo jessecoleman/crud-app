@@ -1,3 +1,11 @@
+/*
+	Cole Chamberlin
+    10/27/15
+    INFO 343
+    Crud-App
+
+    This file contains all the logic for login.html
+ */
 (function() {
     $(document).ready(function() {
         $('#signup').hide();
@@ -38,7 +46,6 @@
                 var user = new Parse.User();
                 user.set('username', username);
                 user.set('password', password);
-                user.set('votes', {});
 
                 user.signUp(null, {
                     success: function() {
