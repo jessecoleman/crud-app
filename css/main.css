@@ -18,6 +18,37 @@ html {
 }
 
 #rating-table {
-    width: 400px;
+    width: 420px;
     height: 100px;
 }
+
+.m-red {
+    border-left: 5px solid #f65314;
+}
+
+.m-green {
+    border-left: 5px solid #7cbb00;
+}
+
+.m-blue {
+    border-left: 5px solid #00a1f1;
+}
+
+.m-yellow {
+    border-left: 5px solid #ffbb00;
+}
+
+#rating-legend {
+    float: right;
+}
+
+#rating-legend td {
+    height: 20px;
+    padding: 0;
+}
+
+#rating-legend i {
+    font-size: 18px;
+    vertical-align: text-top;
+}
+

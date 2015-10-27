@@ -119,12 +119,13 @@
                     .click(function() {voteReview($(this), result)});
                 title.prepend(voteDownButton).prepend(voteUpButton);
                 //if user has voted during previous session, restore old votes
+                /*
                 console.log(currentUser);
-                if(currentUser.get('votes')[result.get('id')] === 'voteUp') {
+                if(currentUser && currentUser.get('votes')[result.get('id')] === 'voteUp') {
                     voteReview(voteUpButton, result);
-                } else if(currentUser.get('votes')[result.get('id')] === 'voteDown') {
+                } else if(currentUser && currentUser.get('votes')[result.get('id')] === 'voteDown') {
                     voteReview(voteDownButton, result);
-                }
+                }*/
             }
             var voteCount = $('<span/>').addClass('vote-count');
                 if(result.get('totalVotes')) {
@@ -149,7 +150,10 @@
 
     var buildTable = function(ratings, numRatings) {
         $('rect').each(function(index) {
-            $(this).attr('width', Math.floor(ratings[index] / numRatings * 400));
+            $(this).attr('width', Math.floor(ratings[index] / numRatings * 100) + '%');
+            $(this).attr('x', 0);
+            $(this).attr('y', 20 * index);
+            $(this).attr('height', '20%');
         });
     };
 
